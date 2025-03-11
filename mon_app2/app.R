@@ -69,8 +69,10 @@ server <- function(input, output, session) {
       #addCircles(radius = ~10^mag/10, weight = 1, color = "#777777",
       #  fillColor = ~pal(mag), fillOpacity = 0.7, popup = ~paste(mag)
       #)
-           addCircles(radius = ~log(Value)*100, weight = 1, color = "#777777",
-        fillColor = "black", fillOpacity = 0.7, popup = ~paste(Value)
+          ## addCircles(radius = ~log(Value), weight = 1, color = "#777777",
+        ##fillColor = "black", fillOpacity = 0.7, popup = ~paste(Value)
+      ##) %>%
+                      addMarkers(popup = ~paste(Value),clusterOptions = markerClusterOptions()
       ) 
   })
 }
