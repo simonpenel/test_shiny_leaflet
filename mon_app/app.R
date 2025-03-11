@@ -43,7 +43,14 @@ server <- function(input, output, session) {
       lat >= latRng[1] & lat <= latRng[2] &
         long >= lngRng[1] & long <= lngRng[2])
 
-    test <- toto$mag
+
+  filteredData <- reactive({
+    quakes[quakes$mag >= input$range[1] & quakes$mag <= input$range[2],]
+  })
+
+  tata <- subset(toto, mag >= input$range[1] & mag <= input$range[2])
+
+    test <- tata$mag
     hist(test)
     # If no zipcodes are in view, don't plot
     #if (nrow(zipsInBounds()) == 0)
