@@ -17,7 +17,7 @@ ui <- bootstrapPage(
 
   leafletOutput("map", width = "100%", height = "100%"),
   
-  absolutePanel(top = 10, right = 10, class = "panel panel-default",
+  absolutePanel(top = 10, right = 10, width = 600, class = "panel panel-default", draggable = TRUE,
     sliderInput("range", "Year", min(masting$Year), max(masting$Year),
       value = range(masting$Year), step = 1, sep ="", width=600
     ),
@@ -27,7 +27,7 @@ ui <- bootstrapPage(
     #checkboxInput("legend", "Show legend", TRUE),
 
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-      draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+      draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
       width = 330, height = "auto",
 
       plotOutput("histCentile", height = 250),
@@ -49,7 +49,7 @@ server <- function(input, output, session) {
     # Use leaflet() here, and only include aspects of the map that
     # won't need to change dynamically (at least, not unless the
     # entire map is being torn down and recreated).
-    leaflet(masting) %>% addTiles() %>%
+    leaflet(masting) %>% addTiles(options = tileOptions(minZoom = 0, maxZoom = 25)) %>%
     fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))
   })
 
