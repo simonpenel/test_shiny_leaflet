@@ -32,7 +32,8 @@ ui <- bootstrapPage(
 
       plotOutput("histCentile", height = 250),
       #plotOutput("scatterCollegeIncome", height = 250)
-      tableOutput("data_masting"),
+      tableOutput("data_masting_variable"),
+      dataTableOutput("data_masting_species"),      
     )
   )
 )
@@ -85,7 +86,7 @@ server <- function(input, output, session) {
     plot(data_plot$Year,data_plot$Value,type="b")
   })
 
- output$data_masting <- renderTable(
+ output$data_masting_variable <- renderTable(
   {    bounds <- input$map_bounds
     latRng <- range(bounds$north, bounds$south)
     lngRng <- range(bounds$east, bounds$west)
@@ -97,6 +98,21 @@ server <- function(input, output, session) {
       Year >= input$range[1] &
       Year <= input$range[2] )
   unique(sort(data_plot$Variable))
+  })
+
+
+ output$data_masting_species <- renderDataTable(
+  {    bounds <- input$map_bounds
+    latRng <- range(bounds$north, bounds$south)
+    lngRng <- range(bounds$east, bounds$west)
+
+
+    data_plot<-subset(masting,
+      Latitude >= latRng[1] & Latitude <= latRng[2] &
+      Longitude >= lngRng[1] & Longitude <= lngRng[2] &
+      Year >= input$range[1] &
+      Year <= input$range[2] )    
+  as.data.frame(unique(sort(data_plot$Species)))
   })
 
 }
