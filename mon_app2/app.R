@@ -2,10 +2,10 @@ library(shiny)
 library(leaflet)
 library(RColorBrewer)
 
-# Masting datao
+# Masting data
 options(encoding="latin1")
-masting <- read.csv("../MASTREEplus_2024-06-26_V2.csv")
-
+#masting <- read.csv("../MASTREEplus_2024-06-26_V2.csv")
+masting <- read.csv("https://github.com/JJFoest/MASTREEplus/raw/refs/heads/main/Data/MASTREEplus_2024-06-26_V2.csv")
 
 # UI
 ui <- bootstrapPage(
