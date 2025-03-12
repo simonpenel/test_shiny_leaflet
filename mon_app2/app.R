@@ -29,7 +29,7 @@ ui <- bootstrapPage(
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
       draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
       width = 330, height = "auto",
-
+      uiOutput("go_buttons"),
       plotOutput("histCentile", height = 250),
       #plotOutput("scatterCollegeIncome", height = 250)
       tableOutput("data_masting_variable"),
@@ -113,6 +113,30 @@ server <- function(input, output, session) {
       Year >= input$range[1] &
       Year <= input$range[2] )    
   as.data.frame(unique(sort(data_plot$Species)))
+  })
+
+#see https://stackoverflow.com/questions/40547786/shiny-can-dynamically-generated-buttons-act-as-trigger-for-an-event
+   
+    obsList <- list()
+   
+    output$go_buttons <- renderUI({
+    buttons <- as.list(1:input$go_btns_quant)
+    buttons <- lapply(buttons, function(i)
+      {
+        btName <- paste0("go_btn",i)
+        # creates an observer only if it doesn't already exists
+        if (is.null(obsList[[btName]])) {
+          # make sure to use <<- to update global variable obsList
+          obsList[[btName]] <<- observeEvent(input[[btName]], {
+            cat("Button ", i, "\n")
+            output$plot <-renderPlot({hist(rnorm(100, 4, 1),breaks = 50*i)})
+          })
+        }
+        fluidRow(
+          actionButton(btName,paste("Go",i))
+        )
+      }
+    )
   })
 
 }
