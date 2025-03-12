@@ -12,7 +12,7 @@ ui <- bootstrapPage(
 
   tags$style(type = "text/css",
     "html, body {width:100%;height:100%}
-    #controls { background-color: #ddd; opacity: 0.5;"
+    #controls { background-color: #ddd; opacity: 0.85;"
   ),
 
   leafletOutput("map", width = "100%", height = "100%"),
@@ -24,14 +24,15 @@ ui <- bootstrapPage(
     selectInput("colors", "Color Scheme",
       rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
     ),
-    checkboxInput("legend", "Show legend", TRUE),
+    #checkboxInput("legend", "Show legend", TRUE),
 
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
       draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
       width = 330, height = "auto",
 
       plotOutput("histCentile", height = 250),
-      plotOutput("scatterCollegeIncome", height = 250)
+      #plotOutput("scatterCollegeIncome", height = 250)
+      tableOutput("data_masting"),
     )
   )
 )
@@ -40,7 +41,7 @@ ui <- bootstrapPage(
 server <- function(input, output, session) {
 
   colorpal <- reactive({
-    colorNumeric(input$colors, quakes$mag)
+    colorNumeric(input$colors, masting$Value)
   })
 
   output$map <- renderLeaflet({
@@ -83,6 +84,21 @@ server <- function(input, output, session) {
 
     plot(data_plot$Year,data_plot$Value,type="b")
   })
+
+ output$data_masting <- renderTable(
+  {    bounds <- input$map_bounds
+    latRng <- range(bounds$north, bounds$south)
+    lngRng <- range(bounds$east, bounds$west)
+
+
+    data_plot<-subset(masting,
+      Latitude >= latRng[1] & Latitude <= latRng[2] &
+      Longitude >= lngRng[1] & Longitude <= lngRng[2] &
+      Year >= input$range[1] &
+      Year <= input$range[2] )
+  unique(sort(data_plot$Variable))
+  })
+
 }
 
 shinyApp(ui, server)
