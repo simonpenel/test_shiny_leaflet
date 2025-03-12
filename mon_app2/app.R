@@ -62,7 +62,7 @@ server <- function(input, output, session) {
     pal<-colorpal()
     leafletProxy("map", data = filteredData()) %>%
       clearMarkerClusters() %>%
-      addMarkers(label = ~paste(Species," ", Year),clusterOptions = markerClusterOptions())
+      addMarkers(label = ~paste(Species," ", Year, " Value =", Value ),clusterOptions = markerClusterOptions())
   })
 }
 
