@@ -2,7 +2,8 @@ library(shiny)
 library(leaflet)
 library(RColorBrewer)
 
-# Masting data
+# Masting datao
+options(encoding="latin1")
 masting <- read.csv("../MASTREEplus_2024-06-26_V2.csv")
 
 
@@ -62,7 +63,25 @@ server <- function(input, output, session) {
     pal<-colorpal()
     leafletProxy("map", data = filteredData()) %>%
       clearMarkerClusters() %>%
-      addMarkers(label = ~paste(Species," ", Year, " Value =", Value ),clusterOptions = markerClusterOptions())
+      addMarkers(label = ~paste(Species," ", Year, " Value=", Value, "Type=",VarType,"[",Variable,"] (in " , Site ,")" ),
+      clusterOptions = markerClusterOptions())
+  })
+
+
+
+    output$histCentile <- renderPlot({  
+    bounds <- input$map_bounds
+    latRng <- range(bounds$north, bounds$south)
+    lngRng <- range(bounds$east, bounds$west)
+
+
+    data_plot<-subset(masting,
+      Latitude >= latRng[1] & Latitude <= latRng[2] &
+      Longitude >= lngRng[1] & Longitude <= lngRng[2] &
+      Year >= input$range[1] &
+      Year <= input$range[2] )
+
+    plot(data_plot$Year,data_plot$Value,type="b")
   })
 }
 
