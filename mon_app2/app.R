@@ -1,6 +1,7 @@
 library(shiny)
 library(leaflet)
 library(RColorBrewer)
+library(shinydashboard)
 
 # Masting data
 options(encoding="latin1")
@@ -14,6 +15,10 @@ ui <- bootstrapPage(
     "html, body {width:100%;height:100%}
     #controls { background-color: #ddd; opacity: 0.85;"
   ),
+
+  #sidebarMenu(
+      menuItemOutput("menuitem"),
+  #  ),
 
   leafletOutput("map", width = "100%", height = "100%"),
   
@@ -29,6 +34,8 @@ ui <- bootstrapPage(
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
       draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
       width = 330, height = "auto",
+
+      numericInput("go_btns_quant","Number of GO buttons",value = 1,min = 1,max = 10),
       uiOutput("go_buttons"),
       plotOutput("histCentile", height = 250),
       #plotOutput("scatterCollegeIncome", height = 250)
@@ -120,8 +127,21 @@ server <- function(input, output, session) {
     obsList <- list()
    
     output$go_buttons <- renderUI({
+
+    bounds <- input$map_bounds
+    latRng <- range(bounds$north, bounds$south)
+    lngRng <- range(bounds$east, bounds$west)
+
+
+    data_plot<-subset(masting,
+      Latitude >= latRng[1] & Latitude <= latRng[2] &
+      Longitude >= lngRng[1] & Longitude <= lngRng[2] &
+      Year >= input$range[1] &
+      Year <= input$range[2] )    
+
+    variables = unique(sort(data_plot$Variable))
     buttons <- as.list(1:input$go_btns_quant)
-    buttons <- lapply(buttons, function(i)
+    buttons <- lapply(variables, function(i)
       {
         btName <- paste0("go_btn",i)
         # creates an observer only if it doesn't already exists
@@ -133,7 +153,8 @@ server <- function(input, output, session) {
           })
         }
         fluidRow(
-          actionButton(btName,paste("Go",i))
+          #actionButton(btName,paste("Go",i))
+          checkboxInput(btName,btName)
         )
       }
     )
