@@ -19,7 +19,7 @@ ui <- bootstrapPage(
 
   leafletOutput("map", width = "100%", height = "100%"),
 
-  absolutePanel(top = 10, left = 20, width = 400, class = "panel panel-default", draggable = TRUE,
+  absolutePanel(top = 10, left = 60, width = 400, class = "panel panel-default", draggable = TRUE,
     downloadButton("download"),
     sliderInput("range", "Year", min(masting$Year), max(masting$Year),
       value = range(masting$Year), step = 1, sep ="", width=600
@@ -32,7 +32,7 @@ ui <- bootstrapPage(
     
     fluidRow(
       column(2, offset = 0,
-            actionButton(inputId = "button", label = "Select species"),
+            actionButton(inputId = "button", label = "Species selection"),
       ),
     ),
     
