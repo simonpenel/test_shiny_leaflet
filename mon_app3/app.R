@@ -29,18 +29,19 @@ ui <- bootstrapPage(
     ),
     #checkboxGroupInput("select_variable", "Variables", choices = variables, selected=variables),
     prettyCheckboxGroup("select_variable", "Variables", choices = variables, selected=variables,status="primary"),
-    actionButton(inputId = "button", label = "show / hide species selection"),
+    actionButton(inputId = "button", label = "Species selection"),
      box(id = "myBox",collapsed=TRUE,
     checkboxGroupInput("select_species", "Species")
      ),
     
     #prettyCheckboxGroup("select_species", "Species", choices =, selected=species),
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-      draggable = TRUE, top = 200, left = "auto", right = 20, bottom = "auto",
+      draggable = TRUE, top = 10, left = "auto", right = 20, bottom = "auto",
       width = 330, height = "auto",
       plotOutput("histCentile", height = 250),
+      uiOutput("titre_table"),
       tableOutput("data_masting_variable"),
-      dataTableOutput("data_masting_species"),
+      # dataTableOutput("data_masting_species"),
     )
   )
 )
@@ -69,8 +70,6 @@ select_in_map_all_species <- function(input) {
   bounds <- input$map_bounds
     latRng <- range(bounds$north, bounds$south)
     lngRng <- range(bounds$east, bounds$west)
-    print(input$variable)
-    print(input$select_variable)
     selected_data<-subset(masting,
       Latitude >= latRng[1] & Latitude <= latRng[2] &
       Longitude >= lngRng[1] & Longitude <= lngRng[2] &
@@ -92,7 +91,6 @@ server <- function(input, output, session) {
 
     ## observe the button being pressed
     observeEvent(input$button, {
-      print(input$button)
       shinyjs::toggle("myBox")
     })
 
@@ -134,7 +132,6 @@ server <- function(input, output, session) {
     #  print(data_plot)
     #  print(unique(sort(data_plot$Species)))
     select_species = unique(sort(data_plot$Species))
-    print(select_species)
     updateCheckboxGroupInput(session, "select_species", 
                              label = NULL,  
                              choices = select_species, 
@@ -152,20 +149,20 @@ server <- function(input, output, session) {
 
 
 
- 
+  output$titre_table <- renderPrint({ HTML(paste0("<b>Values present in the current view:</b>"))})
 
  output$data_masting_variable <- renderTable(
   {    
     data_plot <- select_in_map(input)
   unique(sort(data_plot$Variable))
-  })
+  },colnames=FALSE)
 
 
- output$data_masting_species <- renderDataTable(
-  {   
-    data_plot <- select_in_map(input)
-  as.data.frame(unique(sort(data_plot$Species)))
-  })
+#  output$data_masting_species <- renderDataTable(
+#   {   
+#     data_plot <- select_in_map(input)
+#   as.data.frame(unique(sort(data_plot$Species)))
+#   })
 
   output$download <- downloadHandler(
 
