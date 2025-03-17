@@ -19,7 +19,7 @@ ui <- bootstrapPage(
 
   leafletOutput("map", width = "100%", height = "100%"),
 
-  absolutePanel(top = 10, right = 10, width = 600, class = "panel panel-default", draggable = TRUE,
+  absolutePanel(top = 10, left = 20, width = 400, class = "panel panel-default", draggable = TRUE,
     downloadButton("download"),
     sliderInput("range", "Year", min(masting$Year), max(masting$Year),
       value = range(masting$Year), step = 1, sep ="", width=600
@@ -29,8 +29,8 @@ ui <- bootstrapPage(
     ),
     #checkboxGroupInput("select_variable", "Variables", choices = variables, selected=variables),
     prettyCheckboxGroup("select_variable", "Variables", choices = variables, selected=variables,status="primary"),
-    actionButton(inputId = "button", label = "show / hide"),
-     box(id = "myBox", title = "Species selection",
+    actionButton(inputId = "button", label = "show / hide species selection"),
+     box(id = "myBox",collapsed=TRUE,
     checkboxGroupInput("select_species", "Species")
      ),
     
@@ -84,7 +84,7 @@ select_in_map_all_species <- function(input) {
 
 # SERVER
 server <- function(input, output, session) {
-
+  shinyjs::hide("myBox")
   colorpal <- reactive({
     colorNumeric(input$colors, masting$Value)
   })
