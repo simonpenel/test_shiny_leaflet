@@ -29,9 +29,15 @@ ui <- bootstrapPage(
     ),
     #checkboxGroupInput("select_variable", "Variables", choices = variables, selected=variables),
     prettyCheckboxGroup("select_variable", "Variables", choices = variables, selected=variables,status="primary"),
-    actionButton(inputId = "button", label = "Species selection"),
-     box(id = "myBox",collapsed=TRUE,
-    checkboxGroupInput("select_species", "Species")
+    
+    fluidRow(
+      column(2, offset = 0,
+            actionButton(inputId = "button", label = "Select species"),
+      ),
+    ),
+    
+    box(id = "myBox",collapsed=TRUE,
+    checkboxGroupInput("select_species", "Species in the current view for the selected variables")
      ),
     
     #prettyCheckboxGroup("select_species", "Species", choices =, selected=species),
