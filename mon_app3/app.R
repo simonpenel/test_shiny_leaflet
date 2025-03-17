@@ -3,6 +3,7 @@ library(leaflet)
 library(RColorBrewer)
 #library(shinydashboard)
 library(shinyWidgets)
+library(shinyjs)
 # Masting data
 options(encoding="latin1")
 masting <- read.csv("https://github.com/JJFoest/MASTREEplus/raw/refs/heads/main/Data/MASTREEplus_2024-06-26_V2.csv")
@@ -10,10 +11,10 @@ variables =  unique(sort(masting$Variable))
 species =  unique(sort(masting$Species))
 # UI
 ui <- bootstrapPage(
-
+  useShinyjs(),
   tags$style(type = "text/css",
-    "html, body {width:100%;height:100%}
-    #controls { background-color: #ddd; opacity: 0.85;"
+    "html, body {width:100%;height:100%;overflow-y:scroll}
+    #controls { background-color: #ddd; opacity: 0.85;}"
   ),
 
   leafletOutput("map", width = "100%", height = "100%"),
@@ -27,8 +28,11 @@ ui <- bootstrapPage(
       rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
     ),
     #checkboxGroupInput("select_variable", "Variables", choices = variables, selected=variables),
-    prettyCheckboxGroup("select_variable", "Variables", choices = variables, selected=variables),
-    checkboxGroupInput("select_species", "Species"),
+    prettyCheckboxGroup("select_variable", "Variables", choices = variables, selected=variables,status="primary"),
+    actionButton(inputId = "button", label = "show / hide"),
+     box(id = "myBox", title = "Species selection",
+    checkboxGroupInput("select_species", "Species")
+     ),
     
     #prettyCheckboxGroup("select_species", "Species", choices =, selected=species),
     absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
@@ -86,6 +90,11 @@ server <- function(input, output, session) {
   })
 
 
+    ## observe the button being pressed
+    observeEvent(input$button, {
+      print(input$button)
+      shinyjs::toggle("myBox")
+    })
 
 
   output$map <- renderLeaflet({
