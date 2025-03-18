@@ -11,12 +11,12 @@ masting <- read.csv("https://github.com/JJFoest/MASTREEplus/raw/refs/heads/main/
 variables =  unique(sort(masting$Variable))
 species =  unique(sort(masting$Species))
 
-test <- masting 
-test$Year <- NULL
-test$Value <- NULL
-test <- test[!duplicated(test), ]
-print(nrow(test))
-print(nrow(masting))
+# test <- masting 
+# test$Year <- NULL
+# test$Value <- NULL
+# test <- test[!duplicated(test), ]
+# print(nrow(test))
+# print(nrow(masting))
 # UI
 ui <- bootstrapPage(
   useShinyjs(),
@@ -176,7 +176,10 @@ server <- function(input, output, session) {
   # Output the plot
   output$histCentile <- renderPlot({
     data_plot <- select_in_map(input)
+    if (nrow(data_plot) > 0) {
     plot(data_plot$Year,data_plot$Value,type="b")
+  }
+    
   })
 
   # Output the title of the variables  table
