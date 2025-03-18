@@ -11,10 +11,10 @@ masting <- read.csv("https://github.com/JJFoest/MASTREEplus/raw/refs/heads/main/
 variables =  unique(sort(masting$Variable))
 species =  unique(sort(masting$Species))
 
-# test <- masting 
-# test$Year <- NULL
-# test$Value <- NULL
-# test <- test[!duplicated(test), ]
+test <- masting 
+test$Year <- NULL
+test$Value <- NULL
+test <- test[!duplicated(test), ]
 # print(nrow(test))
 # print(nrow(masting))
 # UI
@@ -118,9 +118,10 @@ server <- function(input, output, session) {
     #   "Positron (minimal)",
     #   "World Imagery (satellite)"
     # ),
-    overlayGroups = c("mast", "Outline"),
+    overlayGroups = c("mast", "circle"),
     options = layersControlOptions(collapsed = FALSE)
-  ) %>%
+  )  %>% 
+  hideGroup("circle")%>%
     fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))
   })
 
@@ -131,10 +132,10 @@ server <- function(input, output, session) {
   })
   
 
-  # filteredCircle <- reactive({
-  #           test[test$Start > input$range[1] & test$End < input$range[2] 
-  #   & test$Variable %in% input$select_variable  & test$Species %in% input$select_species, ] 
-  # })
+  filteredCircle <- reactive({
+            test[test$Start > input$range[1] & test$End < input$range[2] 
+    & test$Variable %in% input$select_variable  & test$Species %in% input$select_species, ] 
+  })
 
 
 
@@ -154,13 +155,12 @@ server <- function(input, output, session) {
   })
 
 
-  # observe({
-  #   pal<-colorpal()
-  #   leafletProxy("map", data = filteredCircle()) %>%
-  #     clearShapes() %>%
-  #     addMarkers(label = ~paste(Alpha_Number,":",Species," ", Start,  "Type=",VarType,"[",Variable,"] (in " , Site ,")" ),
-  #     clusterOptions = markerClusterOptions())
-  # })
+  observe({
+    pal<-colorpal()
+    leafletProxy("map", data = filteredCircle()) %>%
+      clearShapes() %>%
+      addCircles(radius = ~Max_value,group ="circle" )
+  })
 
   # Update the species checkbox
   observe({ 
