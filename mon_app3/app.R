@@ -11,6 +11,12 @@ masting <- read.csv("https://github.com/JJFoest/MASTREEplus/raw/refs/heads/main/
 variables =  unique(sort(masting$Variable))
 species =  unique(sort(masting$Species))
 
+test <- masting 
+test$Year <- NULL
+test$Value <- NULL
+test <- test[!duplicated(test), ]
+print(nrow(test))
+print(nrow(masting))
 # UI
 ui <- bootstrapPage(
   useShinyjs(),
@@ -105,6 +111,16 @@ server <- function(input, output, session) {
     # won't need to change dynamically (at least, not unless the
     # entire map is being torn down and recreated).
     leaflet(masting) %>% addTiles(options = tileOptions(minZoom = 0, maxZoom = 25)) %>%
+      # Layers control
+  addLayersControl(
+    # baseGroups = c(
+    #   "OSM (default)",
+    #   "Positron (minimal)",
+    #   "World Imagery (satellite)"
+    # ),
+    overlayGroups = c("mast", "Outline"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
     fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))
   })
 
@@ -114,6 +130,15 @@ server <- function(input, output, session) {
     & masting$Variable %in% input$select_variable  & masting$Species %in% input$select_species, ] 
   })
   
+
+  # filteredCircle <- reactive({
+  #           test[test$Start > input$range[1] & test$End < input$range[2] 
+  #   & test$Variable %in% input$select_variable  & test$Species %in% input$select_species, ] 
+  # })
+
+
+
+
   # Incremental changes to the map  should be performed in
   # an observer. Each independent set of things that can change
   # should be managed in its own observer.
@@ -124,8 +149,18 @@ server <- function(input, output, session) {
     leafletProxy("map", data = filteredData()) %>%
       clearMarkerClusters() %>%
       addMarkers(label = ~paste(Alpha_Number,":",Species," ", Year, " Value=", Value, "Type=",VarType,"[",Variable,"] (in " , Site ,")" ),
+      group = "mast",
       clusterOptions = markerClusterOptions())
   })
+
+
+  # observe({
+  #   pal<-colorpal()
+  #   leafletProxy("map", data = filteredCircle()) %>%
+  #     clearShapes() %>%
+  #     addMarkers(label = ~paste(Alpha_Number,":",Species," ", Start,  "Type=",VarType,"[",Variable,"] (in " , Site ,")" ),
+  #     clusterOptions = markerClusterOptions())
+  # })
 
   # Update the species checkbox
   observe({ 
