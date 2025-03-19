@@ -15,6 +15,8 @@ test <- masting
 test$Year <- NULL
 test$Value <- NULL
 test <- test[!duplicated(test), ]
+cone <- test[test$Variable == "cone",]
+seed <- test[test$Variable == "seed",]
 # print(nrow(test))
 # print(nrow(masting))
 # UI
@@ -118,10 +120,11 @@ server <- function(input, output, session) {
     #   "Positron (minimal)",
     #   "World Imagery (satellite)"
     # ),
-    overlayGroups = c("mast", "circle"),
+    overlayGroups = c("Time series", "Seed","Cone"),
     options = layersControlOptions(collapsed = FALSE)
   )  %>% 
-  hideGroup("circle")%>%
+  hideGroup("Seed")%>%
+  hideGroup("Cone")%>%
     fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))
   })
 
@@ -137,7 +140,15 @@ server <- function(input, output, session) {
     & test$Variable %in% input$select_variable  & test$Species %in% input$select_species, ] 
   })
 
+  filteredSeed <- reactive({
+            seed[seed$Start > input$range[1] & seed$End < input$range[2] 
+ & seed$Species %in% input$select_species, ] 
+  })
 
+  filteredCone <- reactive({
+            cone[cone$Start > input$range[1] & cone$End < input$range[2] 
+ & cone$Species %in% input$select_species, ] 
+  })
 
 
   # Incremental changes to the map  should be performed in
@@ -150,17 +161,24 @@ server <- function(input, output, session) {
     leafletProxy("map", data = filteredData()) %>%
       clearMarkerClusters() %>%
       addMarkers(label = ~paste(Alpha_Number,":",Species," ", Year, " Value=", Value, "Type=",VarType,"[",Variable,"] (in " , Site ,")" ),
-      group = "mast",
+      group = "Time series",
       clusterOptions = markerClusterOptions())
   })
 
+  observe({
+    pal<-colorpal()
+    leafletProxy("map", data = filteredCone()) %>%
+      clearShapes() %>%
+      addCircles(radius = ~Max_value,group ="Cone" )
+  })
 
   observe({
     pal<-colorpal()
-    leafletProxy("map", data = filteredCircle()) %>%
-      clearShapes() %>%
-      addCircles(radius = ~Max_value,group ="circle" )
+    leafletProxy("map", data = filteredSeed()) %>%
+      removeShape("Seed") %>%
+      addCircles(radius = ~Max_value/100,group ="Seed" )
   })
+
 
   # Update the species checkbox
   observe({ 
