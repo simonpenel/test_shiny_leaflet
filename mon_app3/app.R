@@ -141,12 +141,12 @@ server <- function(input, output, session) {
   })
 
   filteredSeed <- reactive({
-            seed[seed$Start > input$range[1] & seed$End < input$range[2] 
+            seed[seed$Start >= input$range[1] & seed$End <= input$range[2] 
  & seed$Species %in% input$select_species, ] 
   })
 
   filteredCone <- reactive({
-            cone[cone$Start > input$range[1] & cone$End < input$range[2] 
+            cone[cone$Start >= input$range[1] & cone$End <= input$range[2] 
  & cone$Species %in% input$select_species, ] 
   })
 
