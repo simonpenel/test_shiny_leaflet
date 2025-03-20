@@ -17,9 +17,7 @@ test$Value <- NULL
 test <- test[!duplicated(test), ]
 cone <- test[test$Variable == "cone",]
 seed <- test[test$Variable == "seed",]
-# print(nrow(test))
-# print(nrow(masting))
-# UI
+
 ui <- bootstrapPage(
   useShinyjs(),
   tags$style(type = "text/css",
